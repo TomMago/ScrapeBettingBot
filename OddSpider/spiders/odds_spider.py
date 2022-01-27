@@ -2,21 +2,33 @@
 
 import scrapy
 from scrapy_splash import SplashRequest
+from datetime import datetime, timedelta
 
 
 class OddsSpider(scrapy.Spider):
     name = "odds"
     baseurl = "https://www.betexplorer.com"
 
+    def __init__(self, date='today', **kwargs):
+        if date == 'today':
+            self.urls = ['https://www.betexplorer.com/next/soccer/']
+        elif date == 'tomorrow':
+            datestring = (datetime.today() + timedelta(days=1)).strftime('%Y-%m-%d')
+            year = datestring[:4]
+            month = datestring[5:7]
+            day = datestring[8:10]
+            self.urls = ['https://www.betexplorer.com/next/soccer/?year=' + year + '&month=' + month + '&day=' + day]
+        elif "days" in date:
+            days = date[:-4]
+            datestring = (datetime.today() + timedelta(days=int(days))).strftime('%Y-%m-%d')
+            year = datestring[:4]
+            month = datestring[5:7]
+            day = datestring[8:10]
+            self.urls = ['https://www.betexplorer.com/next/soccer/?year=' + year + '&month=' + month + '&day=' + day]
+        super().__init__(**kwargs)
+
     def start_requests(self):
-        urls = [
-            #'http://quotes.toscrape.com/page/1/',
-            #'http://quotes.toscrape.com/page/2/',
-            #'https://www.oddsportal.com/matches/soccer/',
-            #'https://www.betexplorer.com/soccer/'
-            'https://www.betexplorer.com/next/soccer/'
-        ]
-        for url in urls:
+        for url in self.urls:
             #yield #scrapy.Request(url=url, callback=self.parse)
             yield SplashRequest(url, self.parse, args={'wait':0.5})
 
@@ -56,4 +68,5 @@ class OddsSpider(scrapy.Spider):
                             'odd2': bookie.css('td.table-main__detail-odds')[2].css('::attr(data-odd)').get()})
         yield {'Home': response.css('.list-details__item__title')[0].css('a::text').get(),
                'Away': response.css('.list-details__item__title')[1].css('a::text').get(),
+               'Number_Odds': len(bookies),
                'Odds': [bookie for bookie in bookies]}
