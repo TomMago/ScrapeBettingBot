@@ -22,6 +22,8 @@ install docker and get the docker container for splash
 docker pull scrapinghub/splash
 ```
 
+For use in production [aquarium](https://github.com/TeamHG-Memex/aquarium) is advised.
+
 ## Running the bot
 
 First start splash

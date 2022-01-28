@@ -19,7 +19,7 @@ class OddsSpider(scrapy.Spider):
             day = datestring[8:10]
             self.urls = ['https://www.betexplorer.com/next/soccer/?year=' + year + '&month=' + month + '&day=' + day]
         elif "days" in date:
-            days = date[:-4]
+            days = date[:-5]
             datestring = (datetime.today() + timedelta(days=int(days))).strftime('%Y-%m-%d')
             year = datestring[:4]
             month = datestring[5:7]
@@ -63,9 +63,9 @@ class OddsSpider(scrapy.Spider):
                             #'odd1': bookie.css('td.table-main__detail-odds')[0].css('span.table-main__detail-odds--hasarchive::text').get(),
                             #'oddX': bookie.css('td.table-main__detail-odds')[1].css('span.table-main__detail-odds--hasarchive::text').get(),
                             #'odd2': bookie.css('td.table-main__detail-odds')[2].css('span.table-main__detail-odds--hasarchive::text').get()})
-                            'odd1': bookie.css('td.table-main__detail-odds')[0].css('::attr(data-odd)').get(),
-                            'oddX': bookie.css('td.table-main__detail-odds')[1].css('::attr(data-odd)').get(),
-                            'odd2': bookie.css('td.table-main__detail-odds')[2].css('::attr(data-odd)').get()})
+                            'odd1': bookie.css('td.table-main__detail-odds:not(.inactive)')[0].css('::attr(data-odd)').get(),
+                            'oddX': bookie.css('td.table-main__detail-odds:not(.inactive)')[1].css('::attr(data-odd)').get(),
+                            'odd2': bookie.css('td.table-main__detail-odds:not(.inactive)')[2].css('::attr(data-odd)').get()})
         yield {'Home': response.css('.list-details__item__title')[0].css('a::text').get(),
                'Away': response.css('.list-details__item__title')[1].css('a::text').get(),
                'Number_Odds': len(bookies),
